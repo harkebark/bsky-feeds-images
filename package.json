@@ -10,16 +10,7 @@
     "node": "^18.0.0"
   },
   "scripts": {
-    "publishKeyboards": "ts-node scripts/publishKeyboards.ts",
-    "publishCats": "ts-node scripts/publishCats.ts",
-    "publishScience": "ts-node scripts/publishFeedGen.ts",
-    "publishAuspol": "ts-node scripts/publishAuspol.ts",
-    "publishDads": "ts-node scripts/publishDads.ts",
-    "publishDadsMedia": "ts-node scripts/publishDadsMedia.ts",
-    "publish18plusND": "ts-node scripts/publish18plusND.ts",
-    "publishND": "ts-node scripts/publishND.ts",
-    "publishDiscourse": "ts-node scripts/publishDiscourse.ts",
-    "publishElusive": "ts-node scripts/publishElusive.ts",
+    "publishAfterDark": "ts-node scripts/publishAfterDark.ts",
     "start": "ts-node src/index.ts",
     "build": "tsc"
   },

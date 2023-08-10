@@ -11,7 +11,7 @@ import batchUpdate from '../addn/batchUpdate'
 dotenv.config()
 
 // max 15 chars
-export const shortname = 'mutuals-ad'
+export const shortname = 'ad-test'
 
 export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyAgent, requesterDID?: string | null) => {
 
