@@ -28,6 +28,8 @@ export const getPostsForUser = async (
       const post_create = author_posts.pop()
       if (post_create === undefined) continue
 
+      console.log(`Post by ${author}: ${post_create}`)
+
       const post: Post = {
         _id: null,
         uri: post_create.post?.uri,
@@ -39,7 +41,9 @@ export const getPostsForUser = async (
         indexedAt:
           new Date(post_create.post?.indexedAt).getTime() ??
           new Date().getTime(),
+        hasImage: !!(post_create.post?.record['embed']['images']),
         algoTags: null,
+        labels: null
       }
 
       const hash = crypto
