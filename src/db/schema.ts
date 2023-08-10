@@ -13,8 +13,10 @@ export type Post = {
   replyParent: string | null
   replyRoot: string | null
   indexedAt: number
-  algoTags: string[] | null
+  hasImage: boolean
   embed?: any | null
+  algoTags: string[] | null
+  labels: string[] | null
 }
 
 export type SubState = {

@@ -13,7 +13,10 @@ export default async function batchUpdate(agent, interval) {
       interval,
     )
 
-    if (unlabelledPosts.length === 0) continue
+    if (unlabelledPosts.length === 0) {
+      console.log("all posts have labels")
+      continue
+    }
 
     const chunkSize = 25
 

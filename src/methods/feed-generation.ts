@@ -3,11 +3,26 @@ import { Server } from '../lexicon'
 import { AppContext } from '../config'
 import algos from '../algos'
 import { validateAuth } from '../auth'
+import dotenv from 'dotenv'
 import { AtUri } from '@atproto/uri'
+import { BskyAgent } from '@atproto/api'
 
-export default function (server: Server, ctx: AppContext) {
-  server.app.bsky.feed.getFeedSkeleton(async ({ params, req, res }) => {
+// This defines the "getFeedSkeleton" method which is called whenever a request is made for a feed
+export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
+  server.app.bsky.feed.getFeedSkeleton(async ({ params, req }) => {
+    dotenv.config()
+
     const feedUri = new AtUri(params.feed)
+
+    let auth : string | null = null
+
+    // authenticate request
+    try {
+      auth = await validateAuth(req, `did:web:${process.env.FEEDGEN_HOSTNAME}`, ctx.didResolver)
+    } catch (error) {
+      console.log("Failed to authenticate")
+    }
+
     const algo = algos[feedUri.rkey].handler
     if (
       feedUri.hostname !== ctx.cfg.publisherDid ||
@@ -20,24 +35,9 @@ export default function (server: Server, ctx: AppContext) {
       )
     }
 
-    const cacheAge = algos[feedUri.rkey].manager.cacheAge(params)
-    if (cacheAge > 0) {
-      res.setHeader('Cache-Control', `public, max-age=${cacheAge}`)
-    } else {
-      res.setHeader('Cache-Control', `no-cache`)
-    }
-
-    /**
-     * Example of how to check auth if giving user-specific results:
-     *
-     * const requesterDid = await validateAuth(
-     *   req,
-     *   ctx.cfg.serviceDid,
-     *   ctx.didResolver,
-     * )
-     */
-
-    const body = await algo(ctx, params)
+    const body = await algo(ctx, params, agent, auth)
+    console.log("Called feed-generations, returning:")
+    console.log(body)
     return {
       encoding: 'application/json',
       body: body,

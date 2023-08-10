@@ -6,14 +6,15 @@ import { FirehoseSubscriptionBase, getOpsByType } from './util/subscription'
 import dotenv from 'dotenv'
 
 import algos from './algos'
-import batchUpdate from './addn/batchUpdate'
 
 import { Database } from './db'
 
 import crypto from 'crypto'
 import { Post } from './db/schema'
 import { BskyAgent } from '@atproto/api'
+import batchUpdate from './addn/batchUpdate'
 
+// This "firehose" facilitates the modification of the database based on repo events
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   public algoManagers: any[]
 
@@ -22,28 +23,19 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
 
     this.algoManagers = []
 
-    const agent = new BskyAgent({ service: 'https://bsky.social' })
+    Object.keys(algos).forEach((algo) => {
+      this.algoManagers.push(new algos[algo].manager(db))
+    })
 
-    dotenv.config()
-    const handle = `${process.env.FEEDGEN_HANDLE}`
-    const password = `${process.env.FEEDGEN_PASSWORD}`
-
-    agent.login({ identifier: handle, password: password }).then(() => {
-      batchUpdate(agent, 5 * 60 * 1000)
-
-      Object.keys(algos).forEach((algo) => {
-        this.algoManagers.push(new algos[algo].manager(db, agent))
-      })
-
-      this.algoManagers.forEach(async (algo) => {
-        if (await algo._start()) console.log(`${algo.name}: Started`)
-      })
+    this.algoManagers.forEach(async (algo) => {
+      await algo._start()
     })
   }
 
   public authorList: string[]
   public intervalId: NodeJS.Timer
 
+  // Handle a change to the feed repo/database
   async handleEvent(evt: RepoEvent) {
     for (let i = 0; i < this.algoManagers.length; i++) {
       await this.algoManagers[i].ready()
@@ -53,9 +45,26 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     if (!isCommit(evt)) return
     const ops = await getOpsByType(evt)
 
+    // Any posts that should be deleted from the databases because a user deleted them
     const postsToDelete = ops.posts.deletes.map((del) => del.uri)
 
+    const keywords = ["#nsfw"]
+
+    // Any posts that have been made since the last change
     const postsCreated: Post[] = ops.posts.creates.flatMap((create) => {
+
+      const text = create.record?.text?.toLowerCase()
+      let label: string[] | null = null
+
+      if (text) {
+        for (let word of keywords) {
+          if (text.includes(word.toLowerCase())) {
+            label = ['nudity']
+            break
+          }
+        }
+      }
+
       const post: Post = {
         _id: null,
         uri: create.uri,
@@ -65,33 +74,32 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         replyParent: create.record?.reply?.parent.uri ?? null,
         replyRoot: create.record?.reply?.root.uri ?? null,
         indexedAt: new Date().getTime(),
+        hasImage: !!(create?.record?.embed?.images || create?.record?.embed?.media),
         algoTags: null,
         embed: create.record?.embed,
+        labels: label
       }
 
       return [post]
+
     })
 
     const postsToCreate: Post[] = []
 
+    // Check all new posts to see if they should be included in feed database
     for (let post_i = 0; post_i < postsCreated.length; post_i++) {
       const post = postsCreated[post_i]
       const algoTags: string[] = []
       let include = false
 
+      // For each algorithm, check if the post meets algorithm requirements
       for (let i = 0; i < this.algoManagers.length; i++) {
-        let includeAlgo = false
-        try {
-          includeAlgo = await this.algoManagers[i].filter_post(post)
-        } catch (err) {
-          console.error(`${this.algoManagers[i].name}: filter failed`, err)
-          includeAlgo = false
-        }
-        if (includeAlgo) algoTags.push(`${this.algoManagers[i].name}`)
+        const includeAlgo = await this.algoManagers[i].filter_post(post)
         include = include || includeAlgo
+        if (includeAlgo) algoTags.push(`${this.algoManagers[i].name}`)
       }
 
-      if (!include) continue
+      if (!include) return
 
       const hash = crypto
         .createHash('shake256', { outputLength: 12 })
@@ -102,17 +110,21 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       post._id = hash
       post.algoTags = [...algoTags]
 
+      // After determining post eligibility, add it to list of posts to add to DB
       postsToCreate.push(post)
     }
 
+    // Actually delete the posts
     if (postsToDelete.length > 0) {
       await this.db.deleteManyURI('post', postsToDelete)
     }
 
+    // Actually add the new posts
     if (postsToCreate.length > 0) {
-      postsToCreate.forEach(async (to_insert) => {
-        await this.db.replaceOneURI('post', to_insert.uri, to_insert)
-      })
+      // postsToCreate.forEach(async (to_insert) => {
+      //   await this.db.replaceOneURI('post', to_insert.uri, to_insert)
+      // })
+      await this.db.replaceManyURI('post', postsToCreate);
     }
   }
 }

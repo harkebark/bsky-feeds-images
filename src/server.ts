@@ -1,35 +1,45 @@
 import http from 'http'
 import events from 'events'
 import express from 'express'
+import dotenv from 'dotenv'
 import { DidResolver, MemoryCache } from '@atproto/did-resolver'
 import { createServer } from './lexicon'
 import feedGeneration from './methods/feed-generation'
 import describeGenerator from './methods/describe-generator'
-import dbClient from './db/dbClient'
+import dbClient, { dbSingleton } from './db/dbClient'
 import { FirehoseSubscription } from './subscription'
 import { AppContext, Config } from './config'
 import wellKnown from './well-known'
+import { BskyAgent, RichTextSegment } from '@atproto/api'
+import batchUpdate from './addn/batchUpdate'
 
 export class FeedGenerator {
   public app: express.Application
   public server?: http.Server
   public firehose: FirehoseSubscription
   public cfg: Config
+  public db: dbSingleton | null
+  public agent: BskyAgent
 
   constructor(
     app: express.Application,
     firehose: FirehoseSubscription,
     cfg: Config,
+    db: dbSingleton,
+    agent: BskyAgent
   ) {
     this.app = app
     this.firehose = firehose
     this.cfg = cfg
+    this.db = db
+    this.agent = agent
   }
 
-  static create(cfg: Config) {
+  static async create(cfg: Config) {
     const app = express()
     const db = dbClient
     const firehose = new FirehoseSubscription(db, cfg.subscriptionEndpoint)
+
 
     const didCache = new MemoryCache()
     const didResolver = new DidResolver(
@@ -50,15 +60,26 @@ export class FeedGenerator {
       didResolver,
       cfg,
     }
-    feedGeneration(server, ctx)
+
+    const agent = new BskyAgent({service: 'https://bsky.social'})
+    dotenv.config()
+    const handle = `${process.env.FEEDGEN_HANDLE}`
+    const password = `${process.env.FEEDGEN_PASSWORD}`
+
+    await agent.login({identifier: handle, password: password}).then(() => {
+      batchUpdate(agent, 60 * 1000)
+    })
+
+    feedGeneration(server, ctx, agent)
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)
     app.use(wellKnown(ctx))
 
-    return new FeedGenerator(app, firehose, cfg)
+    return new FeedGenerator(app, firehose, cfg, db, agent)
   }
 
   async start(): Promise<http.Server> {
+    // await this.db?.deleteAll('post');
     this.firehose.run(this.cfg.subscriptionReconnectDelay)
     this.server = this.app.listen(this.cfg.port, this.cfg.listenhost)
     await events.once(this.server, 'listening')

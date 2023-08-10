@@ -1,13 +1,11 @@
 import dotenv from 'dotenv'
 import { Database } from '../db'
 import { Post } from '../db/schema'
-import { BskyAgent } from '@atproto/api'
 
 export class AlgoManager {
   private static _instance: AlgoManager
 
   public db: Database
-  public agent: BskyAgent
   public periodicIntervalId: NodeJS.Timer
 
   public name: string = ''
@@ -15,16 +13,10 @@ export class AlgoManager {
   public _isReady: Boolean = false
   public _isStarting: Boolean = false
 
-  constructor(db: Database, agent: BskyAgent) {
+  constructor(db: Database) {
     this.db = db
-    this.agent = agent
     this._isReady = false
     this._isStarting = false
-  }
-
-  public static cacheAge(params): Number {
-    if (params.cursor) return 600
-    return 30
   }
 
   public async _start() {
@@ -33,7 +25,7 @@ export class AlgoManager {
 
     dotenv.config()
 
-    let task_inverval_mins = 15
+    let task_inverval_mins = 2
     if (
       process.env.FEEDGEN_TASK_INTEVAL_MINS !== undefined &&
       Number.parseInt(process.env.FEEDGEN_TASK_INTEVAL_MINS) > 0
@@ -46,7 +38,6 @@ export class AlgoManager {
     await this.periodicTask()
     if (!this.periodicIntervalId) {
       this.periodicIntervalId = setInterval(() => {
-        console.log(`${this.name}: running ${task_inverval_mins}m task`)
         this.periodicTask()
       }, task_inverval_mins * 60 * 1000)
     }
