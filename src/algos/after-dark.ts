@@ -38,7 +38,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
         })
         console.log("Follows:", follows)
         authors.push(...follows)
-        console.log("authors:",)
+        console.log("authors:", authors)
         if(res.data.cursor) {
           req_cursor = res.data.cursor
         } else {
@@ -49,7 +49,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   
       
     } catch (error) {
-      console.log(error)
+      console.log("ERROR:::", error)
     }
     
   } 
