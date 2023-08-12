@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import FeedGenerator from './server'
 
+// Initialization
 const run = async () => {
   dotenv.config()
   const hostname = maybeStr(process.env.FEEDGEN_HOSTNAME) ?? 'example.com'

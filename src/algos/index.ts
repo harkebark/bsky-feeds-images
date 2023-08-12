@@ -8,6 +8,7 @@ import { BskyAgent } from '@atproto/api'
 
 type AlgoHandler = (ctx: AppContext, params: QueryParams, agent: BskyAgent, requesterDID?: string | null) => Promise<AlgoOutput>
 
+// Define more algos here
 const algos = {
   [afterdark.shortname]: {
     handler: <AlgoHandler>afterdark.handler,

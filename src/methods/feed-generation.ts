@@ -12,8 +12,6 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
   server.app.bsky.feed.getFeedSkeleton(async ({ params, req }) => {
     dotenv.config()
 
-    console.log("Received request for feed")
-
     const feedUri = new AtUri(params.feed)
 
     let auth : string | null = null
@@ -25,8 +23,7 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
       console.log("Failed to authenticate")
     }
 
-    console.log(`Request authentication: ${auth}`)
-
+    // Choose the algorithm for the feed
     const algo = algos[feedUri.rkey].handler
     if (
       feedUri.hostname !== ctx.cfg.publisherDid ||
@@ -39,9 +36,9 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
       )
     }
 
+    // Run the algo, get feed body
     const body = await algo(ctx, params, agent, auth)
-    console.log("Called feed-generations, returning:")
-    console.log(body)
+
     return {
       encoding: 'application/json',
       body: body,

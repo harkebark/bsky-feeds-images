@@ -13,6 +13,7 @@ import wellKnown from './well-known'
 import { BskyAgent, RichTextSegment } from '@atproto/api'
 import batchUpdate from './addn/batchUpdate'
 
+// Feed Generator Server code, pretty much everything is created here
 export class FeedGenerator {
   public app: express.Application
   public server?: http.Server
@@ -35,6 +36,7 @@ export class FeedGenerator {
     this.agent = agent
   }
 
+  // Init function, sets up express server, database client, firehose subscription, and logs into bsky agent
   static async create(cfg: Config) {
     const app = express()
     const db = dbClient
@@ -66,11 +68,15 @@ export class FeedGenerator {
     const handle = `${process.env.FEEDGEN_HANDLE}`
     const password = `${process.env.FEEDGEN_PASSWORD}`
 
+    // Sets up event to update database with new labels every minute
+    // This could absolutely be made more efficient using either 
+    // label subscriptions or by queing posts and waiting for labels
+    // before saving to database
     await agent.login({identifier: handle, password: password}).then(() => {
       batchUpdate(agent, 60 * 1000)
     })
 
-    feedGeneration(server, ctx, agent)
+    feedGeneration(server, ctx, agent) // the actual method that runs upon a feed request
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)
     app.use(wellKnown(ctx))

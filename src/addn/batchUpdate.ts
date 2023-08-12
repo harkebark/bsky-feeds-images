@@ -1,5 +1,13 @@
 import dbClient from '../db/dbClient'
 
+// Labels are automatically assigned to posts ~30 seconds after a post is made.
+// This function runs every minute, queries all unlabeled posts, and tries to
+// fetch labels for them.
+
+// This could be made more efficient, either by deleting any unlabelled posts which 
+// still don't have labels after two checks, or by removing this function altogether
+// and queing incoming image posts to have their labels checked BEFORE storing
+// them in the DB. 
 export default async function batchUpdate(agent, interval) {
   let firstRun = true
   while (true) {

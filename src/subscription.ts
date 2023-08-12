@@ -15,6 +15,8 @@ import { BskyAgent } from '@atproto/api'
 import batchUpdate from './addn/batchUpdate'
 
 // This "firehose" facilitates the modification of the database based on repo events
+// Every time there are new posts `handleEvent` gets run. This is where posts
+// are filtered before being stored to the database.
 export class FirehoseSubscription extends FirehoseSubscriptionBase {
   public algoManagers: any[]
 
@@ -48,6 +50,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     // Any posts that should be deleted from the databases because a user deleted them
     const postsToDelete = ops.posts.deletes.map((del) => del.uri)
 
+    // List of words to search for in text for inclusion
     const keywords = ["#nsfw"]
 
     // Any posts that have been made since the last change
@@ -56,6 +59,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
       const text = create.record?.text?.toLowerCase()
       let label: string[] | null = null
 
+      // Checks for keywords, assigns nudity label if found
       if (text) {
         for (let word of keywords) {
           if (text.includes(word.toLowerCase())) {
@@ -65,6 +69,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         }
       }
 
+      // Create Post object for DB
       const post: Post = {
         _id: null,
         uri: create.uri,

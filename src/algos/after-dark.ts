@@ -13,40 +13,37 @@ dotenv.config()
 // max 15 chars
 export const shortname = 'mutuals-ad'
 
+// the handler is run every time a user requests a feed
+// this handler gets a list of every user followed by the requester
+// and fetches all tagged posts from the database which are made 
+// by someone the user is following
 export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyAgent, requesterDID?: string | null) => {
 
   let authors: any[] = [];
   let req_cursor: string | null = null;
 
-  console.log("requesting follows")
-
   if (requesterDID) {
 
     try {
-      
 
+      // following lists are paginated, run in a loop until we've fetched all follows
       while (true) {
 
         const res = await agent.api.app.bsky.graph.getFollows({
           actor: requesterDID,
           ... (req_cursor !== null ? {['cursor']: req_cursor} : {})
         })
-        console.log("res:", res)
 
         const follows = res.data.follows.map((profile) => {
           return profile.did
         })
-        console.log("Follows:", follows)
         authors.push(...follows)
-        console.log("authors:", authors)
         if(res.data.cursor) {
           req_cursor = res.data.cursor
         } else {
           break
         }
-        console.log("cursor:", req_cursor)
       }
-  
       
     } catch (error) {
       console.log("ERROR:::", error)
@@ -54,17 +51,16 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     
   } 
 
-  console.log("querying posts...")
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
     params.limit,
     params.cursor,
     false, // Images
-    true, 
-    false, 
-    authors
+    true, // NSFW Only
+    false, // Exclude NSFW
+    authors // List of authors to restrict query to
   )
-  console.log("posts queried, building feed", builder)
+
   const feed = builder.map((row) => ({
     post: row.uri,
   }))
@@ -81,6 +77,8 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   }
 }
 
+// The manager runs `periodicTask` every 15 minutes, which removes any post older than a week. 
+// `filter_post` is run by the firehose subscription method. It simply filters out posts which don't have media.
 export class manager extends AlgoManager {
   public name: string = shortname
   public async periodicTask() {
