@@ -64,7 +64,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, 
     authors
   )
-  console.log("posts queried, building feed")
+  console.log("posts queried, building feed", builder)
   const feed = builder.map((row) => ({
     post: row.uri,
   }))
