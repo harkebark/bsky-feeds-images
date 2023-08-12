@@ -17,15 +17,15 @@ const run = async () => {
   // A short name for the record that will show in urls
   // Lowercase with no spaces.
   // Ex: whats-hot
-  const recordName = 'mutuals-ad'
+  const recordName = 'ad-test'
 
   // A display name for your feed
   // Ex: What's Hot
-  const displayName = "After Dark"
+  const displayName = "After Dark WIP"
 
   // (Optional) A description of your feed
   // Ex: Top trending content from the whole network
-  const description = `NSFW media from people you follow. Includes all posts with NSFW labels or #nsfw in the post body. Contact @slut.dog for issues.`
+  const description = `NSFW media from people you follow. Includes all posts with NSFW labels or #nsfw in the post body.`
 
   // (Optional) The path to an image to be used as your feed's avatar
   // Ex: ~/path/to/avatar.jpeg
@@ -72,7 +72,7 @@ const run = async () => {
 
   console.log(feedGenDid)
 
-  const res = await agent.api.com.atproto.repo.putRecord({
+  const res = await agent.api.com.atproto.repo.deleteRecord({
     repo: agent.session?.did ?? '',
     collection: ids.AppBskyFeedGenerator,
     rkey: recordName,
