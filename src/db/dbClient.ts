@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from 'mongodb'
+import { ConnectionPoolReadyEvent, MongoClient, ObjectId } from 'mongodb'
 import dotenv from 'dotenv'
 import { InvalidRequestError } from '@atproto/xrpc-server'
 
@@ -153,6 +153,7 @@ export class dbSingleton {
       query['cid'] = { $ne: cid }
     }
 
+    console.log("Fetching posts...")
     const results = this.client
       ?.db()
       .collection('post')
@@ -160,7 +161,7 @@ export class dbSingleton {
       .sort({ indexedAt: -1, cid: -1 })
       .limit(limit)
       .toArray()
-
+    console.log("Fetched: ", results)
     if (results === undefined) return []
     else return results
   }
