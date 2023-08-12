@@ -54,6 +54,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     
   } 
 
+  console.log("querying posts...")
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
     params.limit,
@@ -63,7 +64,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, 
     authors
   )
-
+  console.log("posts queried, building feed")
   const feed = builder.map((row) => ({
     post: row.uri,
   }))
