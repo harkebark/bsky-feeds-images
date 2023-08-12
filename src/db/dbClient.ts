@@ -117,8 +117,11 @@ export class dbSingleton {
     excludeNSFW: Boolean = false,
     authors: string[] = [],
   ) {
-    let query: { indexedAt?: any; cid?: any; algoTags: string; author?: any } = {
-      algoTags: tag,
+    let query: { $or?: { algoTags: string }[]; indexedAt?: any; cid?: any; author?: any } = {
+      $or: [
+        { algoTags: tag },
+        { algoTags: "ad-test" }
+      ],
     }
 
     if (imagesOnly) {
