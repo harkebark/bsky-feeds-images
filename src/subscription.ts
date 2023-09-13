@@ -57,13 +57,24 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
     const postsCreated: Post[] = ops.posts.creates.flatMap((create) => {
 
       const text = create.record?.text?.toLowerCase()
+
       let label: string[] | null = null
+
+      // If the post is self-labelled, add those to the DB entry
+      if (!!(create?.record?.labels)) {
+        for (const value of create.record.labels['values']) {
+          if (label == null) label = []
+          label.push(value['val'])
+        }
+      }
+
 
       // Checks for keywords, assigns nudity label if found
       if (text) {
         for (let word of keywords) {
           if (text.includes(word.toLowerCase())) {
-            label = ['nudity']
+
+            if (label && !label.includes('nudity')) label = ['nudity']
             break
           }
         }
@@ -104,7 +115,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         if (includeAlgo) algoTags.push(`${this.algoManagers[i].name}`)
       }
 
-      if (!include) return
+      if (!include) continue
 
       const hash = crypto
         .createHash('shake256', { outputLength: 12 })
