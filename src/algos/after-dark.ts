@@ -26,6 +26,8 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
     try {
 
+      authors.push(requesterDID)
+
       // following lists are paginated, run in a loop until we've fetched all follows
       while (true) {
 

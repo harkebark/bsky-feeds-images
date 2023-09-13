@@ -12,6 +12,7 @@
   "scripts": {
     "publishAfterDark": "ts-node scripts/publishAfterDark.ts",
     "removeAfterDark": "ts-node scripts/removeAfterDark.ts",
+    "fetchDID": "ts-node scripts/findDIDforUser.ts",
     "start": "ts-node src/index.ts",
     "build": "tsc"
   },

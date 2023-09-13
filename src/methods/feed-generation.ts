@@ -23,6 +23,9 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
       console.log("Failed to authenticate")
     }
 
+    console.log("Incoming request:", req)
+    console.log(auth)
+
     // Choose the algorithm for the feed
     const algo = algos[feedUri.rkey].handler
     if (
