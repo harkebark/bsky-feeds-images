@@ -45,8 +45,8 @@ export class FeedGenerator {
 
     const didCache = new MemoryCache()
     const didResolver = new DidResolver(
-      { plcUrl: 'https://plc.directory' },
-      didCache,
+      { plcUrl: 'https://plc.directory',
+      didCache }
     )
 
     const server = createServer({
