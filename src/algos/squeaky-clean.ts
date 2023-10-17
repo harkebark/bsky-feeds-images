@@ -22,11 +22,14 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   let authors: any[] = [];
   let req_cursor: string | null = null;
 
+  console.log("SQUEAKY CLEAN IS DOIN STUFF")
+
   if (requesterDID) {
 
     try {
 
       authors.push(requesterDID)
+      
 
       // following lists are paginated, run in a loop until we've fetched all follows
       while (true) {
@@ -72,6 +75,9 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   if (last) {
     cursor = `${new Date(last.indexedAt).getTime()}::${last.cid}`
   }
+
+  console.log("squeaky clean is returning:")
+  console.log(feed)
 
   return {
     cursor,

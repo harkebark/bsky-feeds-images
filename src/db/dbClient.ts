@@ -139,12 +139,12 @@ export class dbSingleton {
         $ne: null,
       }
 
-      const twoMinutesAgo = new Date().getTime() - 120000;
-      if (query['indexedAt']) {
-        query['indexedAt']['$lte'] = twoMinutesAgo;
-      } else {
-        query['indexedAt'] = {$lte: twoMinutesAgo}
-      }
+      // const twoMinutesAgo = new Date().getTime() - 120000;
+      // if (query['indexedAt']) {
+      //   query['indexedAt']['$lte'] = twoMinutesAgo;
+      // } else {
+      //   query['indexedAt'] = {$lte: twoMinutesAgo}
+      // }
     }
     if (authors.length > 0) {
       query['author'] = {

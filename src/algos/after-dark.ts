@@ -100,7 +100,7 @@ export class manager extends AlgoManager {
       return_value = true
 
       console.log(
-        `${this.name}: ${post.uri.split('/').at(-1)} has an image}`,
+        `${this.name}: ${post.uri.split('/').at(-1)} has an NSFW image}`,
       )
     }
 
