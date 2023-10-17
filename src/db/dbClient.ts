@@ -136,7 +136,7 @@ export class dbSingleton {
     if (excludeNSFW) {
       query['labels'] = {
         $nin: ['porn', 'nudity', 'sexual', 'underwear'],
-        $ne: null,
+        // $ne: null,
       }
 
       // const twoMinutesAgo = new Date().getTime() - 120000;
