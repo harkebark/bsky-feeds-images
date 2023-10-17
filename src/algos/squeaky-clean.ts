@@ -11,7 +11,7 @@ import batchUpdate from '../addn/batchUpdate'
 dotenv.config()
 
 // max 15 chars
-export const shortname = 'mutuals-ad'
+export const shortname = 'squeaky-clean'
 
 // the handler is run every time a user requests a feed
 // this handler gets a list of every user followed by the requester
@@ -57,9 +57,9 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     shortname,
     params.limit,
     params.cursor,
-    false, // Images
-    true, // NSFW Only
-    false, // Don't Exclude NSFW
+    false, // all posts, not just images
+    false, // not just nsfw
+    true, // exclude nsfw
     authors // List of authors to restrict query to
   )
 
@@ -93,17 +93,6 @@ export class manager extends AlgoManager {
 
 
   public async filter_post(post: Post): Promise<Boolean> {
-
-    let return_value: Boolean | undefined = false
-
-    if (post.hasImage) {
-      return_value = true
-
-      console.log(
-        `${this.name}: ${post.uri.split('/').at(-1)} has an image}`,
-      )
-    }
-
-    return return_value
+    return true
   }
 }

@@ -12,6 +12,8 @@
   "scripts": {
     "publishAfterDark": "ts-node scripts/publishAfterDark.ts",
     "removeAfterDark": "ts-node scripts/removeAfterDark.ts",
+    "publishSqueakyClean": "ts-node scripts/publishSqueakyClean.ts",
+    "removeSqueakyClean": "ts-node scripts/removeSqueakyClean.ts",
     "fetchDID": "ts-node scripts/findDIDforUser.ts",
     "fetchURI": "ts-node scripts/fetchURI.ts",
     "start": "ts-node src/index.ts",
