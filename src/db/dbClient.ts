@@ -117,7 +117,7 @@ export class dbSingleton {
     excludeNSFW: Boolean = false,
     authors: string[] = [],
   ) {
-    let query: { $or?: { algoTags: string }[]; indexedAt?: any; cid?: any; author?: any } = {
+    let query: { algoTags?: any; indexedAt?: any; cid?: any; author?: any } = {
 
     }
 

@@ -31,7 +31,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
       // following lists are paginated, run in a loop until we've fetched all follows
 
       console.log("Fetching followers...")
-      console.time("followFetch")
+      console.time(`followFetch-${requesterDID}`)
 
       while (true) {
 
@@ -50,7 +50,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
           break
         }
       }
-      console.timeEnd("followFetch")
+      console.timeEnd(`followFetch-${requesterDID}`)
 
     } catch (error) {
       console.log("ERROR:::", error)
@@ -59,7 +59,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   }
 
   console.log("querying db...")
-  console.time("query")
+  console.time(`query-${authors.length}`)
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
     params.limit,
@@ -69,7 +69,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, // Don't Exclude NSFW
     authors // List of authors to restrict query to
   )
-  console.timeEnd("query")
+  console.timeEnd(`query-${authors.length}`)
 
   const feed = builder.map((row) => ({
     post: row.uri,
