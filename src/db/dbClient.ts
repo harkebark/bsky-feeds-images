@@ -18,9 +18,9 @@ export class dbSingleton {
 
     const postCollection = this.client.db().collection('post')
 
-    await postCollection.createIndex({ uri: 1 });
+    // await postCollection.createIndex({ uri: 1 });
     await postCollection.createIndex({ indexedAt: -1, cid: -1 });
-    // await postCollection.createIndex({ algoTags: 1 });
+    await postCollection.createIndex({ algoTags: 1 });
     await postCollection.createIndex({ author: 1 });
     await postCollection.createIndex({ labels: 1 });
     await postCollection.createIndex({ "embed.images": 1 });
@@ -64,7 +64,7 @@ export class dbSingleton {
   async replaceManyURI(collection: string, data: any[]) {
     const bulkOps = data.map(to_insert => ({
       replaceOne: {
-        filter: { uri: to_insert.uri},
+        filter: { uri: to_insert.uri },
         replacement: to_insert,
         upsert: true
       }
@@ -221,14 +221,14 @@ export class dbSingleton {
     await this.deleteUntaggedPosts()
   }
 
-  async getUnlabelledPostsWithImages(limit = 100, lagTime =  60 * 1000) {
+  async getUnlabelledPostsWithImages(limit = 100, lagTime = 60 * 1000) {
     const results = this.client
       ?.db()
       .collection('post')
       .find({
         $or: [
-          {'embed.images': { $ne: null }},
-          {'embed.media': { $ne: null }}
+          { 'embed.images': { $ne: null } },
+          { 'embed.media': { $ne: null } }
         ],
         labels: null,
         indexedAt: { $lt: new Date().getTime() - lagTime },
