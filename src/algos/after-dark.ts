@@ -29,6 +29,10 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
       authors.push(requesterDID)
 
       // following lists are paginated, run in a loop until we've fetched all follows
+
+      console.log("Fetching followers...")
+      console.time("followFetch")
+
       while (true) {
 
         const res = await agent.api.app.bsky.graph.getFollows({
@@ -46,6 +50,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
           break
         }
       }
+      console.timeEnd("followFetch")
 
     } catch (error) {
       console.log("ERROR:::", error)
@@ -53,6 +58,8 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
   }
 
+  console.log("querying db...")
+  console.time("query")
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
     params.limit,
@@ -62,6 +69,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, // Don't Exclude NSFW
     authors // List of authors to restrict query to
   )
+  console.timeEnd("query")
 
   const feed = builder.map((row) => ({
     post: row.uri,

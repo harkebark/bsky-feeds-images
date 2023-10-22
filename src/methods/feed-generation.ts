@@ -14,7 +14,7 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
 
     const feedUri = new AtUri(params.feed)
 
-    let auth : string | null = null
+    let auth: string | null = null
 
     // authenticate request
     try {
@@ -22,9 +22,6 @@ export default function (server: Server, ctx: AppContext, agent: BskyAgent) {
     } catch (error) {
       console.log("Failed to authenticate")
     }
-
-    console.log("Incoming request:", req)
-    console.log(auth)
 
     // Choose the algorithm for the feed
     const algo = algos[feedUri.rkey].handler
