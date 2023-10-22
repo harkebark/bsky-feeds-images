@@ -18,7 +18,7 @@ export class dbSingleton {
 
     const postCollection = this.client.db().collection('post')
 
-    // await postCollection.createIndex({ uri: 1 });
+    await postCollection.createIndex({ uri: 1 });
     await postCollection.createIndex({ indexedAt: -1, cid: -1 });
     await postCollection.createIndex({ algoTags: 1 });
     await postCollection.createIndex({ author: 1 });
