@@ -14,7 +14,7 @@ export class dbSingleton {
 
   async init() {
     if (this.client === null) throw new Error('DB Cannot be null')
-    await this.client.connect(10)
+    await this.client.connect()
 
     const postCollection = this.client.db().collection('post')
 
