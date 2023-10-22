@@ -33,25 +33,25 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
         const res = await agent.api.app.bsky.graph.getFollows({
           actor: requesterDID,
-          ... (req_cursor !== null ? {['cursor']: req_cursor} : {})
+          ... (req_cursor !== null ? { ['cursor']: req_cursor } : {})
         })
 
         const follows = res.data.follows.map((profile) => {
           return profile.did
         })
         authors.push(...follows)
-        if(res.data.cursor) {
+        if (res.data.cursor) {
           req_cursor = res.data.cursor
         } else {
           break
         }
       }
-      
+
     } catch (error) {
       console.log("ERROR:::", error)
     }
-    
-  } 
+
+  }
 
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
@@ -98,10 +98,6 @@ export class manager extends AlgoManager {
 
     if (post.hasImage) {
       return_value = true
-
-      console.log(
-        `${this.name}: ${post.uri.split('/').at(-1)} has an NSFW image}`,
-      )
     }
 
     return return_value

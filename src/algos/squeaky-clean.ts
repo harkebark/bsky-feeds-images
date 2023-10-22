@@ -22,39 +22,37 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   let authors: any[] = [];
   let req_cursor: string | null = null;
 
-  console.log("SQUEAKY CLEAN IS DOIN STUFF")
-
   if (requesterDID) {
 
     try {
 
       authors.push(requesterDID)
-      
+
 
       // following lists are paginated, run in a loop until we've fetched all follows
       while (true) {
 
         const res = await agent.api.app.bsky.graph.getFollows({
           actor: requesterDID,
-          ... (req_cursor !== null ? {['cursor']: req_cursor} : {})
+          ... (req_cursor !== null ? { ['cursor']: req_cursor } : {})
         })
 
         const follows = res.data.follows.map((profile) => {
           return profile.did
         })
         authors.push(...follows)
-        if(res.data.cursor) {
+        if (res.data.cursor) {
           req_cursor = res.data.cursor
         } else {
           break
         }
       }
-      
+
     } catch (error) {
       console.log("ERROR:::", error)
     }
-    
-  } 
+
+  }
 
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
@@ -75,9 +73,6 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   if (last) {
     cursor = `${new Date(last.indexedAt).getTime()}::${last.cid}`
   }
-
-  console.log("squeaky clean is returning:")
-  console.log(feed)
 
   return {
     cursor,

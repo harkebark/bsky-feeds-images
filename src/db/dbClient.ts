@@ -14,13 +14,13 @@ export class dbSingleton {
 
   async init() {
     if (this.client === null) throw new Error('DB Cannot be null')
-    await this.client.connect()
+    await this.client.connect(10)
 
     const postCollection = this.client.db().collection('post')
 
     await postCollection.createIndex({ uri: 1 });
     await postCollection.createIndex({ indexedAt: -1, cid: -1 });
-    await postCollection.createIndex({ algoTags: 1 });
+    // await postCollection.createIndex({ algoTags: 1 });
     await postCollection.createIndex({ author: 1 });
     await postCollection.createIndex({ labels: 1 });
     await postCollection.createIndex({ "embed.images": 1 });
@@ -118,21 +118,19 @@ export class dbSingleton {
     authors: string[] = [],
   ) {
     let query: { $or?: { algoTags: string }[]; indexedAt?: any; cid?: any; author?: any } = {
-      $or: [
-        { algoTags: tag },
-        { algoTags: "ad-test" }
-      ],
+
     }
 
-    if (imagesOnly) {
-      query['embed.images'] = { $ne: null }
-    }
+    // if (imagesOnly) {
+    //   query['embed.images'] = { $ne: null }
+    // }
     if (nsfwOnly) {
       query['labels'] = {
         $in: ['porn', 'nudity', 'sexual', 'underwear'],
         $ne: null,
       }
     }
+
     if (excludeNSFW) {
       query['labels'] = {
         $nin: ['porn', 'nudity', 'sexual', 'underwear'],
@@ -146,6 +144,7 @@ export class dbSingleton {
       //   query['indexedAt'] = {$lte: twoMinutesAgo}
       // }
     }
+
     if (authors.length > 0) {
       query['author'] = {
         $in: authors
@@ -163,7 +162,6 @@ export class dbSingleton {
       query['cid'] = { $ne: cid }
     }
 
-    console.log("Fetching posts...")
     const results = this.client
       ?.db()
       .collection('post')
@@ -171,7 +169,6 @@ export class dbSingleton {
       .sort({ indexedAt: -1, cid: -1 })
       .limit(limit)
       .toArray()
-    console.log("Fetched: ", results)
     if (results === undefined) return []
     else return results
   }
