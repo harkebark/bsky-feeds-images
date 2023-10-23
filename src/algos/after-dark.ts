@@ -37,6 +37,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
         const res = await agent.api.app.bsky.graph.getFollows({
           actor: requesterDID,
+          limit: 100, // default 50, max 100
           ... (req_cursor !== null ? { ['cursor']: req_cursor } : {})
         })
 
