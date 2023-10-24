@@ -79,7 +79,6 @@ export class FeedGenerator {
     }
 
     
-    db.deleteSqueakyCleanPosts()
     feedGeneration(server, ctx, agent) // the actual method that runs upon a feed request
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)

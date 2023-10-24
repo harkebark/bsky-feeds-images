@@ -118,7 +118,7 @@ export class dbSingleton {
     authors: string[] = [],
   ) {
     let query: { algoTags?: any; indexedAt?: any; cid?: any; author?: any } = {
-
+      algoTags: 'mutuals-ad'
     }
 
     // if (imagesOnly) {
