@@ -20,7 +20,7 @@ export class dbSingleton {
 
     await postCollection.createIndex({ uri: 1 });
     await postCollection.createIndex({ indexedAt: -1, cid: -1 });
-    // await postCollection.createIndex({ algoTags: 1 });
+    await postCollection.createIndex({ algoTags: 1 });
     await postCollection.createIndex({ author: 1 });
     await postCollection.createIndex({ labels: 1 });
     await postCollection.createIndex({ "embed.images": 1 });
