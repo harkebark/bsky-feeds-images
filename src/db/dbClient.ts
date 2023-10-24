@@ -255,6 +255,21 @@ export class dbSingleton {
       .collection('post')
       .deleteMany({ algoTags: { $size: 0 } })
   }
+  //new
+  async deleteSqueakyCleanPosts() {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  
+    await this.client
+      ?.db()
+      .collection('post')
+      .deleteMany({
+        $and: [
+          { algoTags: { $in: ["squeaky-clean"] } },
+          { algoTags: { $nin: ["mutuals-ad"] } },
+          { createdAt: { $lt: fiveMinutesAgo } }
+        ]
+      });
+  }
 
   async getPostForURI(uri: string) {
     const results = await this.client

@@ -40,6 +40,21 @@ export class FeedGenerator {
   static async create(cfg: Config) {
     const app = express()
     const db = dbClient
+
+
+    const agent = new BskyAgent({service: 'https://bsky.social'})
+    dotenv.config()
+    const handle = `${process.env.FEEDGEN_HANDLE}`
+    const password = `${process.env.FEEDGEN_PASSWORD}`
+
+    // Sets up event to update database with new labels every minute
+    // This could absolutely be made more efficient using either 
+    // label subscriptions or by queing posts and waiting for labels
+    // before saving to database
+    await agent.login({identifier: handle, password: password}).then(() => {
+      batchUpdate(agent, 3 * 60 * 1000)
+    })
+
     const firehose = new FirehoseSubscription(db, cfg.subscriptionEndpoint)
 
 
@@ -63,19 +78,8 @@ export class FeedGenerator {
       cfg,
     }
 
-    const agent = new BskyAgent({service: 'https://bsky.social'})
-    dotenv.config()
-    const handle = `${process.env.FEEDGEN_HANDLE}`
-    const password = `${process.env.FEEDGEN_PASSWORD}`
-
-    // Sets up event to update database with new labels every minute
-    // This could absolutely be made more efficient using either 
-    // label subscriptions or by queing posts and waiting for labels
-    // before saving to database
-    await agent.login({identifier: handle, password: password}).then(() => {
-      batchUpdate(agent, 3 * 60 * 1000)
-    })
-
+    
+    db.deleteSqueakyCleanPosts()
     feedGeneration(server, ctx, agent) // the actual method that runs upon a feed request
     describeGenerator(server, ctx)
     app.use(server.xrpc.router)
