@@ -88,12 +88,12 @@ export class manager extends AlgoManager {
 
     await this.db.removeTagFromOldPosts(
       this.name,
-      new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
+      new Date().getTime(),
     )
   }
 
 
   public async filter_post(post: Post): Promise<Boolean> {
-    return true
+    return false
   }
 }
