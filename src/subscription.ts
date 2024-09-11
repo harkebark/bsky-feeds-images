@@ -90,7 +90,7 @@ export class FirehoseSubscription extends FirehoseSubscriptionBase {
         replyParent: create.record?.reply?.parent.uri ?? null,
         replyRoot: create.record?.reply?.root.uri ?? null,
         indexedAt: new Date().getTime(),
-        hasImage: !!(create?.record?.embed?.images || create?.record?.embed?.media),
+        hasImage: !!(create?.record?.embed?.images || create?.record?.embed?.media || create?.record?.embed?.video),
         algoTags: null,
         embed: create.record?.embed,
         labels: label
