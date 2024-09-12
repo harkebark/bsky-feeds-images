@@ -25,6 +25,7 @@ export class dbSingleton {
     await postCollection.createIndex({ labels: 1 });
     await postCollection.createIndex({ "embed.images": 1 });
     await postCollection.createIndex({ "embed.media": 1 });
+    await postCollection.createIndex({ labels: 1, author: 1, indexedAt: -1, cid: -1 });
   }
 
   // clears database
