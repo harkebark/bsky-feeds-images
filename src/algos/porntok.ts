@@ -19,6 +19,10 @@ export const shortname = 'mutuals-ad-vid'
 // by someone the user is following
 export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyAgent, requesterDID?: string | null) => {
 
+  let pinned: string[] = [
+    ''
+  ]
+
   let authors: any[] = [];
   let req_cursor: string | null = null;
 
@@ -60,6 +64,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   }
 
   console.log("video querying db...")
+  console.log("Cursor: ", params.cursor)
   console.time(`query-${authors.length}`)
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
@@ -75,6 +80,13 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   const feed = builder.map((row) => ({
     post: row.uri,
   }))
+
+  feed.unshift( {
+    post: `at://did:plc:${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`,
+  })
+
+
+
 
   let cursor: string | undefined
   const last = builder.at(-1)
