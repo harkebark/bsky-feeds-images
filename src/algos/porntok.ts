@@ -59,7 +59,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
   }
 
-  console.log("querying db...")
+  console.log("video querying db...")
   console.time(`query-${authors.length}`)
   const builder = await dbClient.getLatestPostsForTag(
     shortname,
