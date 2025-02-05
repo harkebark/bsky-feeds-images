@@ -74,6 +74,7 @@ const run = async () => {
       description: description,
       avatar: avatarRef,
       createdAt: new Date().toISOString(),
+      contentMode: AppBskyFeedDefs.CONTENTMODEVIDEO
     },
   })
 
