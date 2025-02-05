@@ -17,8 +17,8 @@ const algos = {
     manager: afterdark.manager,
   },
   [porntok.shortname]: {
-    handler: <AlgoHandler>afterdark.handler,
-    manager: afterdark.manager,
+    handler: <AlgoHandler>porntok.handler,
+    manager: porntok.manager,
   },
   [squeakyclean.shortname]: {
     handler: <AlgoHandler>squeakyclean.handler,
