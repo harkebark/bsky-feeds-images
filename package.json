@@ -22,12 +22,14 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@atproto/api": "0.13.5",
+    "@atproto/api": "^0.13.5",
     "@atproto/common": "0.4.7",
     "@atproto/did-resolver": "^0.1.0",
-    "@atproto/lexicon": "^0.2.0",
-    "@atproto/repo": "^0.2.0",
+    "@atproto/identity": "^0.4.5",
+    "@atproto/lexicon": "^0.4.1",
+    "@atproto/repo": "^0.5.0",
     "@atproto/sync": "0.1.12",
+    "@atproto/syntax": "^0.3.0",
     "@atproto/uri": "^0.1.0",
     "@atproto/xrpc-server": "^0.7.9",
     "dotenv": "^16.3.1",
