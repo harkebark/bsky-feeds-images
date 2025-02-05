@@ -52,7 +52,7 @@ export class FeedGenerator {
     // label subscriptions or by queing posts and waiting for labels
     // before saving to database
     await agent.login({identifier: handle, password: password}).then(() => {
-      batchUpdate(agent, 3 * 60 * 1000)
+      batchUpdate(agent, 5 * 60 * 1000)
     })
 
     const firehose = new FirehoseSubscription(db, cfg.subscriptionEndpoint)

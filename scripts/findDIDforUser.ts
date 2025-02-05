@@ -19,7 +19,7 @@ const run = async () => {
 
   await agent.login({identifier: handle, password: password})
 
-  const target_handle = "xxxxxx.bsky.social"
+  const target_handle = process.argv.slice(2)[0]
 
   const res = await resolveHandleToDID(target_handle, agent)
 

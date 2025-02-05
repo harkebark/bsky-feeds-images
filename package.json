@@ -10,6 +10,7 @@
     "node": "^18.0.0"
   },
   "scripts": {
+    "checkLabels": "ts-node scripts/checkLabelsForPost.ts",
     "publishAfterDark": "ts-node scripts/publishAfterDark.ts",
     "removeAfterDark": "ts-node scripts/removeAfterDark.ts",
     "publishPorntok": "ts-node scripts/publishPornTok.ts",

@@ -25,7 +25,7 @@ export class AlgoManager {
 
     dotenv.config()
 
-    let task_inverval_mins = 2
+    let task_inverval_mins = 5
     if (
       process.env.FEEDGEN_TASK_INTEVAL_MINS !== undefined &&
       Number.parseInt(process.env.FEEDGEN_TASK_INTEVAL_MINS) > 0
