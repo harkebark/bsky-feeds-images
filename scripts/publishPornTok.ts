@@ -74,8 +74,8 @@ const run = async () => {
       description: description,
       avatar: avatarRef,
       createdAt: new Date().toISOString(),
-      // contentMode: AppBskyFeedDefs.CONTENTMODEVIDEO
-      contentMode: AppBskyFeedDefs.CONTENTMODEUNSPECIFIED
+      contentMode: AppBskyFeedDefs.CONTENTMODEVIDEO
+      // contentMode: AppBskyFeedDefs.CONTENTMODEUNSPECIFIED
 
     },
   })

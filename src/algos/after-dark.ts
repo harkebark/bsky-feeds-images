@@ -76,6 +76,38 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     post: row.uri,
   }))
 
+  // Put pinned posts here
+  
+  let pinned_req_cursor: string | null = null;
+  let pinned: any[] = [
+    // i.e. {post: `at://${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/somepostrecordid`},
+  ]
+
+  for (const post of pinned) {
+    let likes: string[] = []
+    while (true) {
+
+      const res = await agent.api.app.bsky.feed.getLikes({
+        uri: post.post,
+        limit: 100, // default 50, max 100
+        ... (pinned_req_cursor !== null ? { ['cursor']: pinned_req_cursor } : {})
+      })
+
+      const post_likes = res.data.likes.map((actor) => {
+        return actor.actor.did
+      })
+      likes.push(...post_likes)
+      if (res.data.cursor) {
+        pinned_req_cursor = res.data.cursor
+      } else {
+        break
+      }
+    }
+    if (requesterDID && !likes.includes(requesterDID)) {
+      feed.unshift(post)
+    }
+  }
+
   let cursor: string | undefined
   const last = builder.at(-1)
   if (last) {

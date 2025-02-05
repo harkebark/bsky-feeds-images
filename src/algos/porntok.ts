@@ -69,53 +69,13 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, // Images
     true, // NSFW Only
     false, // Don't Exclude NSFW
-    // authors // List of authors to restrict query to
-    []
+    authors // List of authors to restrict query to
   )
   console.timeEnd(`query-${authors.length}`)
 
   const feed = builder.map((row) => ({
     post: row.uri,
   }))
-
-  console.log("Feed:", feed)
-
-
-  let pinned_req_cursor: string | null = null;
-  let pinned: any[] = [
-    {post: `at://${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`}
-  ]
-
-  for (const post of pinned) {
-    let likes: string[] = []
-    while (true) {
-
-      const res = await agent.api.app.bsky.feed.getLikes({
-        uri: post.post,
-        limit: 100, // default 50, max 100
-        ... (pinned_req_cursor !== null ? { ['cursor']: pinned_req_cursor } : {})
-      })
-
-      const post_likes = res.data.likes.map((actor) => {
-        return actor.actor.did
-      })
-      likes.push(...post_likes)
-      if (res.data.cursor) {
-        pinned_req_cursor = res.data.cursor
-      } else {
-        break
-      }
-    }
-    console.log("likes on post:", likes)
-    if (requesterDID && !likes.includes(requesterDID)) {
-      feed.unshift(post)
-      console.log("User has not already liked post")
-    }
-  }
-
-  console.log("Newfeed:", feed)
-
-
 
   let cursor: string | undefined
   const last = builder.at(-1)
@@ -129,15 +89,15 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   }
 }
 
-// The manager runs `periodicTask` every 15 minutes, which removes any post older than a week. 
-// `filter_post` is run by the firehose subscription method. It simply filters out posts which don't have media.
+// The manager runs `periodicTask` every 15 minutes, which removes any post older than a month. 
+// `filter_post` is run by the firehose subscription method. It simply filters out posts which don't have videos.
 export class manager extends AlgoManager {
   public name: string = shortname
   public async periodicTask() {
 
     await this.db.removeTagFromOldPosts(
       this.name,
-      new Date().getTime() - 7 * 24 * 60 * 60 * 1000,
+      new Date().getTime() - 28 * 24 * 60 * 60 * 1000,
     )
   }
 
