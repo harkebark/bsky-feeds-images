@@ -73,7 +73,8 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     false, // Images
     true, // NSFW Only
     false, // Don't Exclude NSFW
-    authors // List of authors to restrict query to
+    // authors // List of authors to restrict query to
+    []
   )
   console.timeEnd(`query-${authors.length}`)
 
@@ -81,10 +82,13 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     post: row.uri,
   }))
 
-  feed.unshift( {
+  console.log("Feed:", feed)
+
+  feed.unshift({
     post: `at://did:plc:${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`,
   })
 
+  console.log("Newfeed:", feed)
 
 
 
