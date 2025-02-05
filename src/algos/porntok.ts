@@ -96,10 +96,10 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
         ... (pinned_req_cursor !== null ? { ['cursor']: pinned_req_cursor } : {})
       })
 
-      const follows = res.data.likes.map((actor) => {
+      const post_likes = res.data.likes.map((actor) => {
         return actor.actor.did
       })
-      authors.push(...follows)
+      likes.push(...post_likes)
       if (res.data.cursor) {
         pinned_req_cursor = res.data.cursor
       } else {
@@ -109,7 +109,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
     console.log("likes on post:", likes)
     if (requesterDID && !likes.includes(requesterDID)) {
       feed.unshift(post)
-      console.log("User has already liked post")
+      console.log("User has not already liked post")
     }
   }
 
