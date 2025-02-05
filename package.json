@@ -12,6 +12,8 @@
   "scripts": {
     "publishAfterDark": "ts-node scripts/publishAfterDark.ts",
     "removeAfterDark": "ts-node scripts/removeAfterDark.ts",
+    "publishPorntok": "ts-node scripts/publishPorntok.ts",
+    "removePorntok": "ts-node scripts/removePorntok.ts",
     "publishSqueakyClean": "ts-node scripts/publishSqueakyClean.ts",
     "removeSqueakyClean": "ts-node scripts/removeSqueakyClean.ts",
     "fetchDID": "ts-node scripts/findDIDforUser.ts",
@@ -20,7 +22,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@atproto/api": "^0.4.1",
+    "@atproto/api": "^0.13.5",
     "@atproto/common": "0.4.7",
     "@atproto/did-resolver": "^0.1.0",
     "@atproto/lexicon": "^0.2.0",
