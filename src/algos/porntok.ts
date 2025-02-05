@@ -93,7 +93,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
       const res = await agent.api.app.bsky.feed.getLikes({
         uri: post.post,
         limit: 100, // default 50, max 100
-        ... (req_cursor !== null ? { ['cursor']: req_cursor } : {})
+        ... (pinned_req_cursor !== null ? { ['cursor']: pinned_req_cursor } : {})
       })
 
       const follows = res.data.likes.map((actor) => {
@@ -101,7 +101,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
       })
       authors.push(...follows)
       if (res.data.cursor) {
-        req_cursor = res.data.cursor
+        pinned_req_cursor = res.data.cursor
       } else {
         break
       }
