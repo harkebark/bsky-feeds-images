@@ -19,10 +19,6 @@ export const shortname = 'mutuals-ad-vid'
 // by someone the user is following
 export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyAgent, requesterDID?: string | null) => {
 
-  let pinned: string[] = [
-    ''
-  ]
-
   let authors: any[] = [];
   let req_cursor: string | null = null;
 
@@ -84,9 +80,38 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
 
   console.log("Feed:", feed)
 
-  feed.unshift({
-    post: `at://${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`,
-  })
+
+  let pinned_req_cursor: string | null = null;
+  let pinned: any[] = [
+    {post: `at://${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`}
+  ]
+
+  for (const post of pinned) {
+    let likes: string[] = []
+    while (true) {
+
+      const res = await agent.api.app.bsky.feed.getLikes({
+        uri: post.post,
+        limit: 100, // default 50, max 100
+        ... (req_cursor !== null ? { ['cursor']: req_cursor } : {})
+      })
+
+      const follows = res.data.likes.map((actor) => {
+        return actor.actor.did
+      })
+      authors.push(...follows)
+      if (res.data.cursor) {
+        req_cursor = res.data.cursor
+      } else {
+        break
+      }
+    }
+    console.log("likes on post:", likes)
+    if (requesterDID && !likes.includes(requesterDID)) {
+      feed.unshift(post)
+      console.log("User has already liked post")
+    }
+  }
 
   console.log("Newfeed:", feed)
 
