@@ -85,7 +85,7 @@ export const handler = async (ctx: AppContext, params: QueryParams, agent: BskyA
   console.log("Feed:", feed)
 
   feed.unshift({
-    post: `at://did:plc:${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`,
+    post: `at://${process.env.FEEDGEN_PUBLISHER_DID}/app.bsky.feed.post/3lhhaq5pkp22x`,
   })
 
   console.log("Newfeed:", feed)
